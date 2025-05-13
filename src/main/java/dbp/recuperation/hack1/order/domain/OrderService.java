@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import dbp.recuperation.hack1.event.events.OrderCreatedEvent;
 import dbp.recuperation.hack1.order.dto.OrderRequestDto;
 import dbp.recuperation.hack1.order.infrastructure.OrderRepository;
+import dbp.recuperation.hack1.productos.domain.Producto;
 import dbp.recuperation.hack1.productos.dto.ProductoDto;
 import dbp.recuperation.hack1.productos.infraestructure.ProductoRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +19,10 @@ public class OrderService {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public String save(OrderRequestDto orden) {
-        orden.getProducts().forEach(producto -> {
-            productoRepository.save(producto);
+        orden.getProduct().forEach(producto -> {
+            Producto productoNew = Producto.builder()
+                    .nombre(producto.getNombre()).build();
+            productoRepository.save(productoNew);
         });
         Order order = Order.builder()
                 .email(orden.getEmail())
