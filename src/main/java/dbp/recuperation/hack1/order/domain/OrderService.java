@@ -1,5 +1,7 @@
 package dbp.recuperation.hack1.order.domain;
 
+import java.util.List;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
@@ -14,28 +16,37 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
-    private final OrderRepository orderRepository;
-    private final ProductoRepository productoRepository;
-    private final ApplicationEventPublisher applicationEventPublisher;
+        private final OrderRepository orderRepository;
+        private final ProductoRepository productoRepository;
+        private final ApplicationEventPublisher applicationEventPublisher;
 
-    public String save(OrderRequestDto orden) {
+        public String save(OrderRequestDto orden) {
+                Order order = Order.builder()
+                                .email(orden.getEmail())
+                                .build();
+                Order savedOrder = orderRepository.save(order); // ✅ Primero persiste Order
 
-        orden.getProduct().forEach(producto -> {
-            Producto productoNew = Producto.builder()
-                    .nombre(producto.getNombre())
-                    .order(null).build();
-            productoRepository.save(productoNew);
-        });
-        Order order = Order.builder()
-                .email(orden.getEmail())
-                .productos(productoRepository.findAll())
-                .build();
-        List<Producto>
-        orderRepository.save(order);
-        applicationEventPublisher
-                .publishEvent(new OrderCreatedEvent(this, order.getId(), order.getEmail(),
-                        order.getProductos().stream()
-                                .map(producto -> ProductoDto.builder().nombre(producto.getNombre()).build()).toList()));
-        return "Order saved";
-    }
+                // 2. Crear productos usando la Order persistida
+                List<Producto> productos = orden.getProduct().stream()
+                                .map(producto -> Producto.builder()
+                                                .nombre(producto.getNombre())
+                                                .order(savedOrder) // ✅ Usa la order persistida
+                                                .build())
+                                .toList();
+
+                // 3. Guardar todos los productos
+                productoRepository.saveAll(productos);
+
+                // 4. Asignar los productos a la order (opcional si lo necesitas después)
+                savedOrder.setProductos(productos);
+
+                // 5. Publicar el evento
+                applicationEventPublisher.publishEvent(
+                                new OrderCreatedEvent(this, savedOrder.getId(), savedOrder.getEmail(),
+                                                productos.stream()
+                                                                .map(producto -> ProductoDto.builder()
+                                                                                .nombre(producto.getNombre()).build())
+                                                                .toList()));
+                return "Order saved";
+        }
 }
