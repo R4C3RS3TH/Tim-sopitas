@@ -1,10 +1,7 @@
 package dbp.recuperation.hack1.productos.domain;
 
 import dbp.recuperation.hack1.order.domain.Order;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,5 +15,6 @@ public class Producto {
 
     private String nombre;
 
+    @ManyToOne
     private Order order;
 }
