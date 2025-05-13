@@ -8,5 +8,5 @@ import java.util.List;
 @Data
 public class orderRequestDto {
     private String email;
-    private List<Producto> products;
+    private List<Producto> product;
 }
