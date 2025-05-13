@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class Order {
 
     private String email;
 
+    @OneToMany(mappedBy = "order")
     private List<Producto> productos;
 
 }

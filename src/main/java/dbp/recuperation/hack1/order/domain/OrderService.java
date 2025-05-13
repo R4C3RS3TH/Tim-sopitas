@@ -19,15 +19,18 @@ public class OrderService {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     public String save(OrderRequestDto orden) {
+
         orden.getProduct().forEach(producto -> {
             Producto productoNew = Producto.builder()
-                    .nombre(producto.getNombre()).build();
+                    .nombre(producto.getNombre())
+                    .order(null).build();
             productoRepository.save(productoNew);
         });
         Order order = Order.builder()
                 .email(orden.getEmail())
                 .productos(productoRepository.findAll())
                 .build();
+        List<Producto>
         orderRepository.save(order);
         applicationEventPublisher
                 .publishEvent(new OrderCreatedEvent(this, order.getId(), order.getEmail(),

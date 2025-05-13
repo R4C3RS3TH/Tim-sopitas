@@ -1,5 +1,6 @@
 package dbp.recuperation.hack1.productos.domain;
 
+import dbp.recuperation.hack1.order.domain.Order;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,4 +17,6 @@ public class Producto {
     private Long id;
 
     private String nombre;
+
+    private Order order;
 }
