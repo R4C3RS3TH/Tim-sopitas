@@ -9,7 +9,6 @@ import dbp.recuperation.hack1.event.events.OrderCreatedEvent;
 import dbp.recuperation.hack1.order.dto.OrderRequestDto;
 import dbp.recuperation.hack1.order.infrastructure.OrderRepository;
 import dbp.recuperation.hack1.productos.domain.Producto;
-import dbp.recuperation.hack1.productos.dto.ProductoDto;
 import dbp.recuperation.hack1.productos.infraestructure.ProductoRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -27,11 +26,26 @@ public class OrderService {
                 Order savedOrder = orderRepository.save(order); // ✅ Primero persiste Order
 
                 // 2. Crear productos usando la Order persistida
+
                 List<Producto> productos = orden.getProduct().stream()
-                                .map(producto -> Producto.builder()
-                                                .nombre(producto.getNombre())
-                                                .order(savedOrder) // ✅ Usa la order persistida
-                                                .build())
+                                .map(productoDto -> {
+                                        Producto producto = productoRepository.findByNombre(productoDto.getNombre())
+                                                        .orElseThrow(() -> new RuntimeException(
+                                                                        "Producto no encontrado: "
+                                                                                        + productoDto.getNombre()));
+
+                                        // Verificar si hay stock suficiente
+                                        if (producto.getStock() <= 0) {
+                                                throw new RuntimeException("No hay stock suficiente para el producto: "
+                                                                + producto.getNombre());
+                                        }
+
+                                        // Reducir el stock
+                                        producto.setStock(producto.getStock() - 1); // o usa productoDto.getCantidad()
+                                                                                    // si manejas cantidades
+
+                                        return producto;
+                                })
                                 .toList();
 
                 // 3. Guardar todos los productos
@@ -43,10 +57,11 @@ public class OrderService {
                 // 5. Publicar el evento
                 applicationEventPublisher.publishEvent(
                                 new OrderCreatedEvent(this, savedOrder.getId(), savedOrder.getEmail(),
-                                                productos.stream()
-                                                                .map(producto -> ProductoDto.builder()
-                                                                                .nombre(producto.getNombre()).build())
-                                                                .toList()));
+                                                productos));
                 return "Order saved";
+        }
+
+        public List<Order> getAll() {
+                return orderRepository.findAll();
         }
 }

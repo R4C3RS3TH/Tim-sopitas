@@ -7,4 +7,5 @@ import lombok.Data;
 @Builder
 public class ProductoDto {
     private String nombre;
+    private Long stock;
 }
