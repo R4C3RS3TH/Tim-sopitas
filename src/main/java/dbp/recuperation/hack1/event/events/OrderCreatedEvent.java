@@ -1,8 +1,10 @@
 package dbp.recuperation.hack1.event.events;
 
+import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 import java.util.List;
 
+@Getter
 public class OrderCreatedEvent extends ApplicationEvent {
     private final Long orderId;
     private final String email;
@@ -15,7 +17,4 @@ public class OrderCreatedEvent extends ApplicationEvent {
         this.products = products;
     }
 
-    public Long getOrderId() { return orderId; }
-    public String getEmail() { return email; }
-    public List<String> getProducts() { return products; }
 }
