@@ -1,6 +1,6 @@
 package dbp.recuperation.hack1.event.observers;
 
-import com.tuempresa.events.OrderCreatedEvent;
+import dbp.recuperation.hack1.event.events.OrderCreatedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.event.EventListener;
