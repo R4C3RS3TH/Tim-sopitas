@@ -1,4 +1,4 @@
-package dbp.recuperation.hack1.events;
+package dbp.recuperation.hack1.event.events;
 
 import org.springframework.context.ApplicationEvent;
 import java.util.List;
